@@ -22,49 +22,10 @@
  * SCHED_DEADLINE exists since Linux kernel 3.14
  */
 
-#define _GNU_SOURCE
 #include <stdio.h>       /* printf() */
 #include <time.h>        /* clock_gettime() */
-#include <stdint.h>      /* int*_t */
-#include <sys/syscall.h> /* SYS_* */
-#include <unistd.h>      /* syscall() */
 
-#define gettid()      syscall(SYS_gettid)
-#define sched_yield() syscall(SYS_sched_yield)
-
-#define SCHED_DEADLINE 6
-
-struct sched_attr {
-	uint32_t size;
-
-	uint32_t sched_policy;
-	uint64_t sched_flags;
-
-	/* SCHED_NORMAL, SCHED_BATCH */
-	int32_t sched_nice;
-
-	/* SCHED_FIFO, SCHED_RR */
-	uint32_t sched_priority;
-
-	/* SCHED_DEADLINE (nsec) */
-	uint64_t sched_runtime;
-	uint64_t sched_deadline;
-	uint64_t sched_period;
-};
-
-int
-sched_setattr(pid_t pid, const struct sched_attr *attr,
-              unsigned int flags)
-{
-	return syscall(SYS_sched_setattr, pid, attr, flags);
-}
-
-int
-sched_getattr(pid_t pid, struct sched_attr *attr,
-              unsigned int size, unsigned int flags)
-{
-	return syscall(SYS_sched_getattr, pid, attr, size, flags);
-}
+#include "sched_deadline.h"
 
 static void
 time_diff(struct timespec *diff,
